@@ -27,16 +27,17 @@ def connect_with_players():
     players = []
     player_num = 1
     for _ in range(2):
+        idx = player_num - 1
         p = socket()
         p.bind(('', PORT + player_num))
         p.listen(5)
         print(f"Waiting for player {player_num}.")
         conn, addr = p.accept()
         players.append(conn)        
-        msg = f"""Let's play NOUGHTS AND CROSSES!
+        msg =  f"""Let's play Noughts and Crosses
 You are player {player_num}.      
-You will play as {PIECES[player_num-1]}"""
-        send_message(msg, players[player_num-1])
+You will play as {PIECES[idx]}"""
+        send_message(msg, players[idx])
         player_num += 1
     return players
 
@@ -56,9 +57,9 @@ def transmit_end_game(players, winner, moves):
         if winner == "D":
             send_message(board + "It was a draw!\n\nThanks for playing.", player)
         elif winner == piece:
-            send_message(board + "YOU WON!!!\n\nThanks for playing.", player)
+            send_message(board + "You won!!!\n\nThanks for playing.", player)
         else:
-            send_message(board + "you lost ;'(\n\nThanks for playing.", player)
+            send_message(board + "You lost ;'(\n\nThanks for playing.", player)
 
 def x_wins(combination):
     return not all(num % 2 for num in combination)
