@@ -1,29 +1,21 @@
 from socket import socket
+from typing import List
+
 PORT = 40676
 W, H = 3, 3
 PIECES = ["X", "O"]
 MOVE_FLAG = 0xF0
 DELIM = "///"
 
-# set up board
-# wait for connection
-# player 1 assign as X
-# player 2 assign as O
-# while not game over
-    # get move from current player
-    # update board
-    # check for win
-    # send board and move history to next player
+#############################################
 
-def send_message(msg, player_connection):
-    if type(msg) == str:
-        player_connection.send(msg.encode())
-    else:
-        player_connection.send(bytes(msg))
+def send_message(msg : str,
+                 player_connection: socket):
+    player_connection.send(msg.encode())
 
+#############################################
 
-def connect_with_players():
-    
+def connect_with_players() -> List[socket]:    
     players = []
     player_num = 1
     for _ in range(2):
@@ -41,17 +33,25 @@ You will play as {PIECES[idx]}"""
         player_num += 1
     return players
 
-def get_move(player_num, current_player):    
+#############################################
+
+def get_move(player_num: int, 
+             current_player: socket) -> str:    
     move = current_player.recv(1).decode()
     print("Received player's move", move)
     return move
 
+#############################################
 
-def transmit_board(player, log, moves):
+def transmit_board(player: socket, log: str, moves: List[int]):
     print("sending board")
     send_message(str(moves) + DELIM + log, player)
 
-def transmit_end_game(players, winner, moves):
+#############################################
+
+def transmit_end_game(players: List[socket],
+                      winner: str,
+                      moves: List[int]):
     for player, piece in zip(players, PIECES):
         board = str(moves) + DELIM
         if winner == "D":
@@ -61,13 +61,9 @@ def transmit_end_game(players, winner, moves):
         else:
             send_message(board + "You lost ;'(\n\nThanks for playing.", player)
 
-def x_wins(combination):
-    return not all(num % 2 for num in combination)
+#############################################
 
-def o_wins(combination):
-    return all(num % 2 for num in combination)
-
-def check_winner(moves):
+def check_winner(moves: List[int]) -> str:
     # rows
     board = ["" for _ in range(9)]
     for i, m in enumerate(moves):
@@ -102,6 +98,7 @@ def check_winner(moves):
     # game continues
     return ""
 
+#############################################
 
 if __name__ == "__main__":
     players = connect_with_players()
@@ -113,7 +110,7 @@ if __name__ == "__main__":
         
         player_index = round % 2
         this_player = player_index + 1
-        other_player = int(not(player_index - 1)) + 1
+        other_player = int(not player_index) + 1
         current_player = players[player_index]
         transmit_board(current_player, log, moves)
         move = get_move(this_player, current_player)
