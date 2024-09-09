@@ -1,5 +1,6 @@
 from socket import socket
 from typing import List
+import subprocess
 
 PORT = 40676
 W, H = 3, 3
@@ -101,6 +102,8 @@ def check_winner(moves: List[int]) -> str:
 #############################################
 
 if __name__ == "__main__":
+    result = subprocess.run(["ipconfig"], capture_output=True, text=True, check=True)
+    print(f"Running noughts and crosses server on {result.stdout}")
     players = connect_with_players()
     winner = ""
     round = 0

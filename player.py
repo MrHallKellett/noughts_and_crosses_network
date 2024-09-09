@@ -5,10 +5,16 @@ from json import loads
 from typing import List
 
 CLEAR = "clear" if platform == "Darwin" else "cls"
-PORT = 40676 + int(argv[1])
-player = socket()
+
+try:
+    PORT = 40676 + int(argv[1])
+    SERVER_IP = argv[2]
+except IndexError:
+    print("Correct usage: python player.py <player_number> <server_ip>")
+    input()
+    exit()
+
 PIECES = ["X", "O"]
-MOVE_FLAG = 0xF0.to_bytes()
 RED = "\033[38;2;255;0;0m"
 GREEN = "\033[38;2;0;255;0m"
 WHITE = "\033[38;2;210;210;210m"
@@ -59,7 +65,8 @@ def transmit_move(player: socket, move: int):
 
 
 if __name__ == "__main__":
-    player.connect(('127.0.0.1', PORT))
+    player = socket()
+    player.connect((SERVER_IP, PORT))
     player.settimeout(100)
     game_over = False
     msg = player.recv(1024)
